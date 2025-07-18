@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlineEducationPlatform.Domain.Users;
 using OnlineEducationPlatform.Web.Models;
@@ -20,29 +21,44 @@ namespace OnlineEducationPlatform.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login(string returnUrl )
+        [AllowAnonymous]
+        public IActionResult Login(string? returnUrl = null)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
+        [AllowAnonymous]
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-
             if (!ModelState.IsValid)
                 return View(model);
 
-            var result = await _signInManager.PasswordSignInAsync(
-                model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
+            ApplicationUser user = null;
 
-            if (result.Succeeded)
+            // Check if identifier is an email
+            if (model.Email.Contains("@"))
             {
-                return RedirectToLocal(returnUrl);
+                user = await _userManager.FindByEmailAsync(model.Email);
+            }
+            else
+            {
+                user = await _userManager.FindByNameAsync(model.Email);
             }
 
-            ModelState.AddModelError("", "Invalid login attempt.");
+            if (user != null)
+            {
+                var result = await _signInManager.PasswordSignInAsync(user.UserName, model.Password, false, false);
+                if (result.Succeeded)
+                {
+                    if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
+                        return Redirect(model.ReturnUrl);
+
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return View(model);
         }
 
@@ -58,7 +74,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             return View();
         }
 
-        private IActionResult RedirectToLocal(string returnUrl)
+        private IActionResult RedirectToLocal(string returnUrl = null)
         {
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                 return Redirect(returnUrl);

@@ -58,7 +58,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             }
             var user = new ApplicationUser
             {
-                UserName = model.Email,
+                UserName= model.Email.Split('@')[0].Trim(),
                 Email = model.Email,
                 FullName = model.FullName,
                 Role = model.Role
@@ -107,7 +107,7 @@ namespace OnlineEducationPlatform.Web.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
             if (roles.Contains("Admin"))
-                return Unauthorized(); // block editing Admins
+                return Unauthorized(); 
 
             var model = new EditUserViewModel
             {
@@ -136,8 +136,8 @@ namespace OnlineEducationPlatform.Web.Controllers
 
             user.FullName = model.FullName;
             user.Email = model.Email;
-            user.UserName = model.Email;
-
+            user.UserName = model.Email.Split('@')[0].Trim(); 
+            
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
