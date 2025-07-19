@@ -1,6 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OnlineEducationPlatform.Domain.Users;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using OnlineEducationPlatform.Web.Users;
 
 namespace OnlineEducationPlatform.Infrastructure.Data
 {

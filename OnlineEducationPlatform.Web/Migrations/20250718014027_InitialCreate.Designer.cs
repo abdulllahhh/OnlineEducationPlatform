@@ -9,7 +9,7 @@ using OnlineEducationPlatform.Infrastructure.Data;
 
 #nullable disable
 
-namespace OnlineEducationPlatform.Infrastructure.Migrations
+namespace OnlineEducationPlatform.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20250718014027_InitialCreate")]

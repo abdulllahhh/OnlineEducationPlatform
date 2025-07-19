@@ -8,7 +8,7 @@ using OnlineEducationPlatform.Infrastructure.Data;
 
 #nullable disable
 
-namespace OnlineEducationPlatform.Infrastructure.Migrations
+namespace OnlineEducationPlatform.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot

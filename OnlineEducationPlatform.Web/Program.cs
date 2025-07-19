@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Identity;
-using OnlineEducationPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using OnlineEducationPlatform.Domain.Users;
+using OnlineEducationPlatform.Web.Users;
+using OnlineEducationPlatform.Infrastructure.Data;
 
 namespace OnlineEducationPlatform.Web
 {

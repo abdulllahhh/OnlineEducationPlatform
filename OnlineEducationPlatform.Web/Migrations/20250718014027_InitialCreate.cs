@@ -1,9 +1,8 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
 
-namespace OnlineEducationPlatform.Infrastructure.Migrations
+namespace OnlineEducationPlatform.Web.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
