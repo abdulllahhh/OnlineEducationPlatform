@@ -53,6 +53,12 @@
                             </li>
                                 
                         }
+                        @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="ManageAccount" asp-action="Index">My Account</a>
+                            </li>
+                        }
                             
                     </ul>
                 </div>
