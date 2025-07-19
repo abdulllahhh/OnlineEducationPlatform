@@ -2,7 +2,6 @@
 {
     public class AssignmentSubmission
     {
-        public int SubmissionId { get; set; }
         public int AssignmentId { get; set; }
         public string StudentId { get; set; }
         public string FilePath { get; set; }

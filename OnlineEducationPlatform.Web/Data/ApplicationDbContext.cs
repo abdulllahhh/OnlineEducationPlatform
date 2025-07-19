@@ -7,6 +7,16 @@ namespace OnlineEducationPlatform.Infrastructure.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        DbSet<Class> Classes { get; set; }
+        DbSet<Subject> Subjects { get; set; }
+        DbSet<ClassSubject> ClassSubjects { get; set; }
+        DbSet<Assignment> Assignments { get; set; }
+        DbSet<Question> Questions { get; set; }
+        DbSet<Exam> Exams { get; set; }
+        DbSet<Enrollment> Enrollments { get; set; }
+        DbSet<ExamSubmission> ExamSubmissions { get; set; }
+        DbSet<AssignmentSubmission> AssignmentSubmission { get; set; }
+        DbSet<Book> Books { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -15,6 +25,7 @@ namespace OnlineEducationPlatform.Infrastructure.Data
         {
 
             modelBuilder.Entity<ClassSubject>().HasKey(cs => new { cs.ClassId, cs.SubjectId });
+            modelBuilder.Entity<AssignmentSubmission>().HasKey(asb => new { asb.AssignmentId, asb.StudentId });
             // Class Relationships
             modelBuilder.Entity<Class>(entity =>
             {
