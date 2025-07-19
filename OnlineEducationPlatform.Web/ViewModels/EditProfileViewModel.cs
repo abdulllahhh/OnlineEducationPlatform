@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
-namespace OnlineEducationPlatform.Web.Models
+namespace OnlineEducationPlatform.Web.ViewModels
 {
     public class EditProfileViewModel
     {

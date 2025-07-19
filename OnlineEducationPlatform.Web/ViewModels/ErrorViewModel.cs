@@ -1,4 +1,4 @@
-namespace OnlineEducationPlatform.Web.Models
+namespace OnlineEducationPlatform.Web.ViewModels
 {
     public class ErrorViewModel
     {

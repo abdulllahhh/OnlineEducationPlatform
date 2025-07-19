@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using OnlineEducationPlatform.Web.Models;
 using OnlineEducationPlatform.Web.Users;
 
 namespace OnlineEducationPlatform.Web.Controllers

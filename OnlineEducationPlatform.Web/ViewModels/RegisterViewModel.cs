@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OnlineEducationPlatform.Web.Models
+namespace OnlineEducationPlatform.Web.ViewModels
 {
-    public class CreateUserViewModel
+    public class RegisterViewModel
     {
         [Required]
         public string FullName { get; set; }
@@ -12,9 +12,10 @@ namespace OnlineEducationPlatform.Web.Models
         public string Email { get; set; }
 
         [Required]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
 
         [Required]
-        public string Role { get; set; } // "Student" or "Instructor"
+        public string Role { get; set; } // Admin, Instructor, Student
     }
 }
