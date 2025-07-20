@@ -7,16 +7,16 @@ namespace OnlineEducationPlatform.Infrastructure.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        DbSet<Class> Classes { get; set; }
-        DbSet<Subject> Subjects { get; set; }
-        DbSet<ClassSubject> ClassSubjects { get; set; }
-        DbSet<Assignment> Assignments { get; set; }
-        DbSet<Question> Questions { get; set; }
-        DbSet<Exam> Exams { get; set; }
-        DbSet<Enrollment> Enrollments { get; set; }
-        DbSet<ExamSubmission> ExamSubmissions { get; set; }
-        DbSet<AssignmentSubmission> AssignmentSubmission { get; set; }
-        DbSet<Book> Books { get; set; }
+        public DbSet<Class> Classes { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
+        public DbSet<ClassSubject> ClassSubjects { get; set; }
+        public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<Question> Questions { get; set; }
+        public DbSet<Exam> Exams { get; set; }
+        public DbSet<Enrollment> Enrollments { get; set; }
+        public DbSet<ExamSubmission> ExamSubmissions { get; set; }
+        public DbSet<AssignmentSubmission> AssignmentSubmission { get; set; }
+        public DbSet<Book> Books { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
