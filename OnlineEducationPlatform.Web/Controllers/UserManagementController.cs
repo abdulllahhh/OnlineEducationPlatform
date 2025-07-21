@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OnlineEducationPlatform.Infrastructure.Data;
 using OnlineEducationPlatform.Web.Users;
 
 namespace OnlineEducationPlatform.Web.Controllers
@@ -12,30 +13,30 @@ namespace OnlineEducationPlatform.Web.Controllers
 
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ApplicationDbContext  _context;
 
-        public UserManagementController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UserManagementController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
-            var users = await _userManager.Users.ToListAsync();
 
-            var filteredUsers = new List<ApplicationUser>();
+            var Students = _context.Users.Where(u => u.Role == "Student").ToList();
+            var Teachers = _context.Users.Where(u => u.Role == "Instructor").ToList();
 
-            foreach (var user in users)
+            var Users = new TeacherStudentViewModel()
             {
-                var roles = await _userManager.GetRolesAsync(user);
-                if (!roles.Contains("Admin"))
-                {
-                    filteredUsers.Add(user);
-                }
-            }
-
-            return View(filteredUsers);
+                Students = Students,
+                Teachers = Teachers
+            };
+            
+            return View(Users);
         }
+
         [HttpGet]
         public IActionResult Create() => View();
 

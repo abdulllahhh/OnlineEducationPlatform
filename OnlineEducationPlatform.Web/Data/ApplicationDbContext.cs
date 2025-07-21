@@ -31,7 +31,7 @@ namespace OnlineEducationPlatform.Infrastructure.Data
             {
                 // Class -> Teacher (Many-to-One)
                 entity.HasOne(c => c.Teacher)
-                      .WithMany(t => t.Classes)
+                      .WithMany() // Optionally, you can add .WithMany(t => t.Classes) if you want reverse navigation
                       .HasForeignKey(c => c.TeacherId)
                       .OnDelete(DeleteBehavior.Restrict);
 

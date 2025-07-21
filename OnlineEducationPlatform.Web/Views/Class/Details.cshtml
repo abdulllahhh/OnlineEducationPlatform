@@ -1,0 +1,23 @@
+﻿@model OnlineEducationPlatform.Web.Models.Class
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1 class="mb-4">Class Details</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4">
+            <dl class="row mb-3">
+                <dt class="col-sm-4 fw-bold">@Html.DisplayNameFor(model => model.ClassName)</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.ClassName)</dd>
+                <dt class="col-sm-4 fw-bold">@Html.DisplayNameFor(model => model.Teacher)</dt>
+                <dd class="col-sm-8">@Html.DisplayFor(model => model.Teacher.FullName)</dd>
+            </dl>
+            <div class="text-center">
+                <a asp-action="Edit" asp-route-id="@Model?.ClassId" class="btn btn-secondary me-2">Edit</a>
+                <a asp-action="Index" class="btn btn-link">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
