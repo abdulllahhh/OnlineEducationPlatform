@@ -98,6 +98,25 @@ namespace OnlineEducationPlatform.Web.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet]
+
+/*        [HttpPost]
+        public IActionResult AddClassToSubject(int subjectId, int classId)
+        {
+            var subject = _context.Subjects.Find(subjectId);
+            if (subject == null)
+            {
+                return NotFound();
+            }
+            var classSubject = new ClassSubject
+            {
+                SubjectId = subjectId,
+                ClassId = classId,
+                AddedDate = DateTime.Now
+            };
+            _context.ClassSubjects.Add(classSubject);
+            _context.SaveChanges();
+            return RedirectToAction("Details", new { id = subjectId });
+        }*/
         public IActionResult Details(int id)
         {
             var subject = _context.Subjects.Find(id);
