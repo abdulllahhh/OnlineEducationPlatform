@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnlineEducationPlatform.Infrastructure.Data;
 
 namespace OnlineEducationPlatform.Web.Controllers
 {
+    [Authorize(Roles ="Admin")]
     public class SubjectController : Controller
     {
         private readonly ApplicationDbContext _context;

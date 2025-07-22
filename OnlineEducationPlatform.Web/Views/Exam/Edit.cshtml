@@ -1,0 +1,130 @@
+﻿@model OnlineEducationPlatform.Web.ViewModels.ExamViewModel
+@{
+    ViewData["Title"] = "Edit Exam";
+}
+
+<h2>Edit Exam</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="ExamId" />
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Instructions" class="form-label"></label>
+        <textarea asp-for="Instructions" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AvailableFrom"></label>
+        <input asp-for="AvailableFrom" type="datetime-local" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AvailableTo"></label>
+        <input asp-for="AvailableTo" type="datetime-local" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="TimeLimitMinutes"></label>
+        <input asp-for="TimeLimitMinutes" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PassingScore"></label>
+        <input asp-for="PassingScore" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ClassId"></label>
+        <select asp-for="ClassId" asp-items="Model.Classes" class="form-control"></select>
+    </div>
+
+    <hr />
+    <h4>Questions</h4>
+    <div id="questions-container"></div>
+    <button type="button" class="btn btn-secondary" onclick="addQuestion()">Add Question</button>
+
+    <br /><br />
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <script>
+        let questionIndex = 0;
+
+        @if (Model.Questions != null)
+        {
+                foreach (var q in Model.Questions)
+                {
+                        <text>
+                        addQuestionFromModel(@Html.Raw(Json.Serialize(q)));
+                        </text>
+                }
+        }
+
+        function addQuestionFromModel(q) {
+            const container = document.getElementById("questions-container");
+
+            let html = `
+                <div class="card mb-3 p-3 border">
+                    <input type="hidden" name="Questions[${questionIndex}].QuestionId" value="${q.questionId}" />
+                    <div class="mb-2">
+                        <label>Text</label>
+                        <input name="Questions[${questionIndex}].Text" class="form-control" value="${q.text}" required />
+                    </div>
+                    <div class="mb-2">
+                        <label>Points</label>
+                        <input type="number" name="Questions[${questionIndex}].Points" class="form-control" value="${q.points}" required />
+                    </div>
+                    <div class="mb-2">
+                        <label>Options</label>
+                        <div id="question-${questionIndex}-options">
+            `;
+
+            for (let i = 0; i < q.options.length; i++) {
+                html += `
+                    <div class="input-group mb-1">
+                        <input name="Questions[${questionIndex}].Options[${i}]" class="form-control" value="${q.options[i]}" />
+                    </div>
+                `;
+            }
+
+            html += `
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addOption(${questionIndex})">Add Option</button>
+                    </div>
+                    <div class="mb-2">
+                        <label>Correct Answer</label>
+                        <input name="Questions[${questionIndex}].CorrectAnswer" class="form-control" value="${q.correctAnswer}" required />
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', html);
+            questionIndex++;
+        }
+
+        function addQuestion() {
+            addQuestionFromModel({ questionId: 0, text: "", points: 1, options: [""], correctAnswer: "" });
+        }
+
+        function addOption(qIndex) {
+            const optionsDiv = document.getElementById(`question-${qIndex}-options`);
+            const optionCount = optionsDiv.querySelectorAll('input').length;
+
+            const optionInput = `
+                <div class="input-group mb-1">
+                    <input name="Questions[${qIndex}].Options[${optionCount}]" class="form-control" />
+                </div>
+            `;
+
+            optionsDiv.insertAdjacentHTML('beforeend', optionInput);
+        }
+    </script>
+}

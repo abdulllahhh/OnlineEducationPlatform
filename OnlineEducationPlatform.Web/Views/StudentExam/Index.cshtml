@@ -1,0 +1,37 @@
+﻿@model List<OnlineEducationPlatform.Web.ViewModels.ExamListItemViewModel>
+@{
+    ViewData["Title"] = "Available Exams";
+}
+
+<h2>Available Exams</h2>
+
+@if (Model.Count == 0)
+{
+    <p>No exams are currently available.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Available From</th>
+                <th>Available To</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var exam in Model)
+            {
+                <tr>
+                    <td>@exam.Title</td>
+                    <td>@exam.AvailableFrom.ToShortDateString()</td>
+                    <td>@exam.AvailableTo.ToShortDateString()</td>
+                    <td>
+                        <a class="btn btn-primary" asp-controller="StudentExam" asp-action="Solve" asp-route-id="@exam.ExamId">Solve</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

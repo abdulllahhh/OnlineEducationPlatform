@@ -1,0 +1,45 @@
+﻿@model OnlineEducationPlatform.Web.Models.Exam
+
+@{
+    ViewData["Title"] = "Exam Details";
+}
+
+<h2>Exam Details</h2>
+
+<div class="card p-3 mb-4">
+    <h4>@Model.Title</h4>
+    <p><strong>Class:</strong> @Model.Class?.ClassName</p>
+    <p><strong>Instructions:</strong> @Model.Instructions</p>
+    <p><strong>Available From:</strong> @Model.AvailableFrom.ToString("yyyy-MM-dd HH:mm")</p>
+    <p><strong>Available To:</strong> @Model.AvailableTo.ToString("yyyy-MM-dd HH:mm")</p>
+    <p><strong>Time Limit:</strong> @Model.TimeLimitMinutes minutes</p>
+    <p><strong>Passing Score:</strong> @Model.PassingScore</p>
+</div>
+
+@if (Model.Questions != null && Model.Questions.Any())
+{
+    <h4>Questions</h4>
+    <ol>
+        @foreach (var q in Model.Questions)
+        {
+            <li class="mb-3">
+                <p><strong>Text:</strong> @q.Text</p>
+                <p><strong>Points:</strong> @q.Points</p>
+                <p><strong>Options:</strong></p>
+                <ul>
+                    @foreach (var option in q.Options)
+                    {
+                        <li>@option</li>
+                    }
+                </ul>
+                <p><strong>Correct Answer:</strong> @q.CorrectAnswer</p>
+            </li>
+        }
+    </ol>
+}
+else
+{
+    <p>No questions added yet.</p>
+}
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Back to List</a>
