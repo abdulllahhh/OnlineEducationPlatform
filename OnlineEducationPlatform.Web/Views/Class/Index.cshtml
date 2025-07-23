@@ -6,8 +6,8 @@
 
 <h1 class="mb-4">Classes</h1>
 <div class="mb-3 text-end">
-
-    <a asp-controller="Enrollment" asp-action="Edit" class="btn btn-info">Assign Students to Class</a>
+    
+    <a asp-controller="Enrollment" asp-action="Edit" class="btn btn-info">Manage Class Students</a>
     <a asp-action="Create" class="btn btn-primary">Add New Class</a>
 </div>
 <div class="table-responsive">
@@ -24,7 +24,8 @@
                 <tr>
                     <td>@Html.DisplayFor(modelItem => item.ClassName)</td>
                     <td>@Html.DisplayFor(modelItem => item.Teacher.FullName)</td>
-                    <td>
+                    <td class="text-end">
+                        <a asp-controller="ClassSubject" asp-action="Edit" asp-route-id="@item.ClassId" class="btn btn-secondary">Manage Class Subjects</a>
                         <a asp-action="Edit" asp-route-id="@item.ClassId" class="btn btn-sm btn-warning me-1">Edit</a>
                         <a asp-action="Details" asp-route-id="@item.ClassId" class="btn btn-sm btn-info me-1">Details</a>
                         <a asp-action="Delete" asp-route-id="@item.ClassId" class="btn btn-sm btn-danger">Delete</a>
