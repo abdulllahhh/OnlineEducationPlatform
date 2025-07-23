@@ -1,4 +1,6 @@
-﻿namespace OnlineEducationPlatform.Web.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace OnlineEducationPlatform.Web.Models
 {
     public class Exam
     {
@@ -9,6 +11,8 @@
         public DateTime AvailableTo { get; set; }
         public int TimeLimitMinutes { get; set; }
         public int PassingScore { get; set; }
+        [NotMapped]
+        public bool IsAvailable => DateTime.UtcNow >= AvailableFrom && DateTime.UtcNow <= AvailableTo;
 
         // Relationships
         public int ClassId { get; set; }

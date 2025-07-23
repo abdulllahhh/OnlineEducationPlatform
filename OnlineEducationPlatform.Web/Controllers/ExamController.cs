@@ -6,7 +6,7 @@ using OnlineEducationPlatform.Infrastructure.Data;
 
 namespace OnlineEducationPlatform.Web.Controllers
 {
-    [Authorize(Roles = "Admin && Instructor")]
+    [Authorize(Roles = "Admin, Instructor")]
     public class ExamController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -55,7 +55,10 @@ namespace OnlineEducationPlatform.Web.Controllers
                     Value = c.ClassId.ToString(),
                     Text = c.ClassName
                 }).ToList();
-
+                if (exam.AvailableFrom >= exam.AvailableTo)
+                {
+                    ModelState.AddModelError("", "Available From must be earlier than Available To.");
+                }
                 return View(exam);
             }
 
@@ -145,7 +148,10 @@ namespace OnlineEducationPlatform.Web.Controllers
                 }).ToList();
                 return View(model);
             }
-
+            if (model.AvailableFrom >= model.AvailableTo)
+            {
+                ModelState.AddModelError("", "Available From must be earlier than Available To.");
+            }
             var exam = _context.Exams
                 .Include(e => e.Questions)
                 .FirstOrDefault(e => e.ExamId == model.ExamId);

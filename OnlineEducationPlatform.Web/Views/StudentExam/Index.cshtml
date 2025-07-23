@@ -4,7 +4,10 @@
 }
 
 <h2>Available Exams</h2>
-
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
 @if (Model.Count == 0)
 {
     <p>No exams are currently available.</p>
@@ -17,7 +20,8 @@ else
                 <th>Title</th>
                 <th>Available From</th>
                 <th>Available To</th>
-                <th></th>
+                <th>Status</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +32,24 @@ else
                     <td>@exam.AvailableFrom.ToShortDateString()</td>
                     <td>@exam.AvailableTo.ToShortDateString()</td>
                     <td>
-                        <a class="btn btn-primary" asp-controller="StudentExam" asp-action="Solve" asp-route-id="@exam.ExamId">Solve</a>
+                        @if (exam.HasSubmitted)
+                        {
+                            <span class="text-success">Submitted (Score: @exam.Score)</span>
+                        }
+                        else
+                        {
+                            <span class="text-warning">Not Submitted</span>
+                        }
+                    </td>
+                    <td>
+                        @if (exam.HasSubmitted)
+                        {
+                            <a class="btn btn-outline-info" asp-controller="StudentExam" asp-action="Result" asp-route-id="@exam.ExamId">View Result</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-primary" asp-controller="StudentExam" asp-action="Solve" asp-route-id="@exam.ExamId">Solve</a>
+                        }
                     </td>
                 </tr>
             }

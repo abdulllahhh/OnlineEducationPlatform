@@ -4,6 +4,9 @@
 }
 
 <h2>@Model.Title</h2>
+<div class="alert alert-info">
+    Time Remaining: <span id="timer">--:--</span>
+</div>
 
 <form asp-action="Solve" method="post">
     <input type="hidden" asp-for="ExamId" />
@@ -32,3 +35,28 @@
 
     <button type="submit" class="btn btn-success">Submit Answers</button>
 </form>
+<script>
+    let timeLeft = @Model.TimeLimitMinutes * 60; // in seconds
+    const timerDisplay = document.getElementById("timer");
+    const form = document.querySelector("form");
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function updateTimer() {
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Time is up! Your answers will be submitted.");
+            form.submit();
+        } else {
+            timerDisplay.textContent = formatTime(timeLeft);
+            timeLeft--;
+        }
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer(); // initial call
+</script>

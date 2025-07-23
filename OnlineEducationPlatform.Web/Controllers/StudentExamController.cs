@@ -18,7 +18,10 @@ namespace OnlineEducationPlatform.Web.Controllers
         }
         public IActionResult Index()
         {
+            var studentId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
             var exams = _context.Exams
+                .Include(e => e.Submissions)
                 .Where(e => DateTime.Now >= e.AvailableFrom && DateTime.Now <= e.AvailableTo)
                 .Select(e => new ExamListItemViewModel
                 {
@@ -26,15 +29,33 @@ namespace OnlineEducationPlatform.Web.Controllers
                     Title = e.Title,
                     Instructions = e.Instructions,
                     AvailableFrom = e.AvailableFrom,
-                    AvailableTo = e.AvailableTo
+                    AvailableTo = e.AvailableTo,
+                    HasSubmitted = e.Submissions.Any(s => s.StudentId == studentId),
+                    Score = e.Submissions
+                            .Where(s => s.StudentId == studentId)
+                            .Select(s => s.Score)
+                            .FirstOrDefault()
                 }).ToList();
 
             return View(exams);
         }
 
+
+
         [HttpGet]
         public IActionResult Solve(int id)
         {
+            var studentId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value!;
+
+            var alreadySubmitted = _context.ExamSubmissions
+                .Any(s => s.ExamId == id && s.StudentId == studentId);
+
+            if (alreadySubmitted)
+            {
+                TempData["Error"] = "You have already submitted this exam.";
+                return RedirectToAction("Index");
+            }
+
             var exam = _context.Exams
                 .Include(e => e.Questions)
                 .FirstOrDefault(e => e.ExamId == id);
@@ -45,6 +66,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             {
                 ExamId = exam.ExamId,
                 Title = exam.Title,
+                TimeLimitMinutes = exam.TimeLimitMinutes,
                 Questions = exam.Questions.Select(q => new StudentQuestionAnswerViewModel
                 {
                     QuestionId = q.QuestionId,
@@ -65,25 +87,79 @@ namespace OnlineEducationPlatform.Web.Controllers
 
             if (exam == null) return NotFound();
 
-            int totalScore = 0;
-            int score = 0;
+            decimal totalScore = 0;
+            decimal score = 0;
+
+            var answers = new Dictionary<int, string>();
 
             foreach (var question in exam.Questions)
             {
-                totalScore += (int)question.Points;
+                totalScore += question.Points;
 
-                var studentAnswer = model.Questions.FirstOrDefault(q => q.QuestionId == question.QuestionId)?.Answer;
+                var studentAnswer = model.Questions
+                    .FirstOrDefault(q => q.QuestionId == question.QuestionId)?.Answer;
+
+                answers[question.QuestionId] = studentAnswer;
 
                 if (!string.IsNullOrWhiteSpace(studentAnswer) && studentAnswer == question.CorrectAnswer)
                 {
-                    score += (int)question.Points;
+                    score += question.Points;
                 }
             }
 
+            // Save submission
+            var submission = new ExamSubmission
+            {
+                ExamId = model.ExamId,
+                StudentId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value!,
+                StartedAt = DateTime.UtcNow,
+                SubmittedAt = DateTime.UtcNow,
+                Score = score,
+                Answers = answers
+            };
+
+            _context.ExamSubmissions.Add(submission);
+            _context.SaveChanges();
+
             ViewBag.TotalScore = totalScore;
             ViewBag.StudentScore = score;
-
-            return View("Result");
+            TempData["Success"] = $"Your answers were submitted successfully. You scored {score}/{totalScore}.";
+            return RedirectToAction("Index");
         }
+        [HttpGet]
+        public IActionResult Result(int id)
+        {
+            var studentId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var submission = _context.ExamSubmissions
+                .Include(s => s.Exam)
+                    .ThenInclude(e => e.Questions)
+                .FirstOrDefault(s => s.ExamId == id && s.StudentId == studentId);
+
+            if (submission == null)
+                return NotFound();
+
+            var viewModel = new StudentSolveExamViewModel
+            {
+                ExamId = submission.ExamId,
+                Title = submission.Exam.Title,
+                Questions = submission.Exam.Questions.Select(q => new StudentQuestionAnswerViewModel
+                {
+                    QuestionId = q.QuestionId,
+                    Text = q.Text,
+                    Options = q.Options ?? new List<string>(),
+                    Answer = submission.Answers != null && submission.Answers.ContainsKey(q.QuestionId)
+                ? submission.Answers[q.QuestionId]
+                : null,
+                    CorrectAnswer = q.CorrectAnswer
+                }).ToList()
+
+            };
+
+            ViewBag.StudentScore = submission.Score;
+            return View("Result", viewModel);
+        }
+
+
     }
 }

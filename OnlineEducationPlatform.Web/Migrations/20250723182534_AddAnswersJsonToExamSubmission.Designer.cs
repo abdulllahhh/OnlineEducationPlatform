@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineEducationPlatform.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using OnlineEducationPlatform.Infrastructure.Data;
 namespace OnlineEducationPlatform.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250723182534_AddAnswersJsonToExamSubmission")]
+    partial class AddAnswersJsonToExamSubmission
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -370,39 +373,6 @@ namespace OnlineEducationPlatform.Web.Migrations
                     b.ToTable("ExamSubmissions");
                 });
 
-            modelBuilder.Entity("OnlineEducationPlatform.Web.Models.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Notifications");
-                });
-
             modelBuilder.Entity("OnlineEducationPlatform.Web.Models.Question", b =>
                 {
                     b.Property<int>("QuestionId")
@@ -693,17 +663,6 @@ namespace OnlineEducationPlatform.Web.Migrations
                     b.Navigation("Student");
                 });
 
-            modelBuilder.Entity("OnlineEducationPlatform.Web.Models.Notification", b =>
-                {
-                    b.HasOne("OnlineEducationPlatform.Web.Users.ApplicationUser", "User")
-                        .WithMany("Notifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("OnlineEducationPlatform.Web.Models.Question", b =>
                 {
                     b.HasOne("OnlineEducationPlatform.Web.Models.Exam", "Exam")
@@ -738,11 +697,6 @@ namespace OnlineEducationPlatform.Web.Migrations
                     b.Navigation("Assignments");
 
                     b.Navigation("Classes");
-                });
-
-            modelBuilder.Entity("OnlineEducationPlatform.Web.Users.ApplicationUser", b =>
-                {
-                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("OnlineEducationPlatform.Web.Models.Student", b =>
