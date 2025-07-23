@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OnlineEducationPlatform.Web.Models;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -7,6 +8,7 @@ namespace OnlineEducationPlatform.Infrastructure.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<Class> Classes { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<ClassSubject> ClassSubjects { get; set; }
@@ -26,10 +28,18 @@ namespace OnlineEducationPlatform.Infrastructure.Data
 
             modelBuilder.Entity<ClassSubject>().HasKey(cs => new { cs.ClassId, cs.SubjectId });
             modelBuilder.Entity<AssignmentSubmission>().HasKey(asb => new { asb.AssignmentId, asb.StudentId });
+
+            modelBuilder.Entity<Notification>( entity =>
+            {
+                entity.HasOne(n => n.User)
+                      .WithMany(u => u.Notifications)
+                      .HasForeignKey(n => n.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
             // Class Relationships
             modelBuilder.Entity<Class>(entity =>
             {
-                // Class -> Teacher (Many-to-One)
+                // Class -> Teacher (One-to-Many)
                 entity.HasOne(c => c.Teacher)
                       .WithMany() // Optionally, you can add .WithMany(t => t.Classes) if you want reverse navigation
                       .HasForeignKey(c => c.TeacherId)

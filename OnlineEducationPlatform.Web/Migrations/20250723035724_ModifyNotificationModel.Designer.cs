@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineEducationPlatform.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using OnlineEducationPlatform.Infrastructure.Data;
 namespace OnlineEducationPlatform.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250723035724_ModifyNotificationModel")]
+    partial class ModifyNotificationModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -259,7 +262,7 @@ namespace OnlineEducationPlatform.Web.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Classes");
+                    b.ToTable("Class");
                 });
 
             modelBuilder.Entity("OnlineEducationPlatform.Web.Models.ClassSubject", b =>
@@ -396,7 +399,7 @@ namespace OnlineEducationPlatform.Web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notification");
                 });
 
             modelBuilder.Entity("OnlineEducationPlatform.Web.Models.Question", b =>
