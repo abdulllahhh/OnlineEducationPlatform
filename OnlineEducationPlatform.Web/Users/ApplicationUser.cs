@@ -11,5 +11,6 @@ namespace OnlineEducationPlatform.Web.Users
     {
         public string FullName { get; set; }
         public string Role { get; set; }
+        public List<Notification> Notifications { get; set; }
     }
 }

@@ -4,102 +4,145 @@
     ViewData["Title"] = "Create Exam";
 }
 
-<h2>Create Exam</h2>
-
-<form asp-action="Create" method="post">
-    <div class="mb-3">
-        <label>Title</label>
-        <input asp-for="Title" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Instructions</label>
-        <textarea asp-for="Instructions" class="form-control"></textarea>
-    </div>
-
-    <div class="mb-3">
-        <label>Available From</label>
-        <input asp-for="AvailableFrom" type="datetime-local" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Available To</label>
-        <input asp-for="AvailableTo" type="datetime-local" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Time Limit (minutes)</label>
-        <input asp-for="TimeLimitMinutes" type="number" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Passing Score</label>
-        <input asp-for="PassingScore" type="number" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Class</label>
-        <select asp-for="ClassId" asp-items="Model.Classes" class="form-select"></select>
-    </div>
-
-    <hr />
-    <h4>Questions</h4>
-
-    <div id="questions-container"></div>
-    <button type="button" class="btn btn-secondary my-2" onclick="addQuestion()">Add Question</button>
-
-    <hr />
-    <button type="submit" class="btn btn-primary">Save Exam</button>
-</form>
-
+<div class="row justify-content-center" style="min-height: 70vh;">
+    <form asp-action="Create" method="post" onsubmit="reindexQuestions()" class="row w-100">
+        <div class="col-md-5">
+            <div class="card shadow p-4 mb-4" style="background: #f9fafc; border-radius: 1.5rem;">
+                <h2 class="mb-4 text-primary">Create Exam</h2>
+                <div class="mb-3">
+                    <label class="form-label text-secondary">Title</label>
+                    <input asp-for="Title" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-secondary">Instructions</label>
+                    <textarea asp-for="Instructions" class="form-control"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-secondary">Available From</label>
+                    <input asp-for="AvailableFrom" type="datetime-local" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-secondary">Available To</label>
+                    <input asp-for="AvailableTo" type="datetime-local" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-secondary">Time Limit (minutes)</label>
+                    <input asp-for="TimeLimitMinutes" type="number" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-secondary">Passing Score</label>
+                    <input asp-for="PassingScore" type="number" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-secondary">Class</label>
+                    <select asp-for="ClassId" asp-items="Model.Classes" class="form-select"></select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 mt-4">Save Exam</button>
+                <a class="btn btn-secondary w-100 mt-2" asp-area="" asp-controller="Exam" asp-action="Index">Back to Exams</a>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <div class="card shadow p-4 mt-4 mt-md-0" style="background: #f9fafc; border-radius: 1.5rem;">
+                <h4 class="text-primary mb-3">Questions</h4>
+                <div id="questions-container"></div>
+                <button type="button" class="btn btn-outline-secondary w-100" onclick="addQuestion()">Add Question</button>
+            </div>
+        </div>
+    </form>
+</div>
 @section Scripts {
     <script>
         let questionIndex = 0;
 
         function addQuestion() {
             const container = document.getElementById("questions-container");
-
+            const qId = `question-card-${Date.now()}-${Math.floor(Math.random()*10000)}`;
             const questionHtml = `
-                <div class="card p-3 mb-3">
-                    <h5>Question #${questionIndex + 1}</h5>
+                <div class="card p-3 mb-3 position-relative" id="${qId}">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-2" aria-label="Remove" onclick="removeQuestion('${qId}')"></button>
+                    <h5 class="question-number">Question</h5>
                     <div class="mb-2">
                         <label>Text</label>
-                        <input name="Questions[${questionIndex}].Text" class="form-control" required />
+                        <input class="form-control question-text" required />
                     </div>
                     <div class="mb-2">
                         <label>Points</label>
-                        <input name="Questions[${questionIndex}].Points" type="number" class="form-control" required />
+                        <input type="number" class="form-control question-points" required />
                     </div>
                     <div class="mb-2">
-                        <label>Options</label>
-                        <div id="question-${questionIndex}-options">
+                        <div class="question-options">
+                            <button type="button" class="btn btn-secondary add-option-btn mb-2">Add Option</button>
                             <div class="input-group mb-1">
-                                <input name="Questions[${questionIndex}].Options[0]" class="form-control" required />
-                                <button type="button" class="btn btn-outline-secondary" onclick="addOption(${questionIndex})">+</button>
+                                <input class="form-control question-option" required />
                             </div>
                         </div>
                     </div>
                     <div class="mb-2">
                         <label>Correct Answer</label>
-                        <input name="Questions[${questionIndex}].CorrectAnswer" class="form-control" required />
+                        <input class="form-control question-correct" required />
                     </div>
                 </div>
             `;
-
             container.insertAdjacentHTML('beforeend', questionHtml);
             questionIndex++;
+            renumberQuestions();
+            reindexQuestions();
         }
 
-        function addOption(qIndex) {
-            const optionsDiv = document.getElementById(`question-${qIndex}-options`);
-            const optionCount = optionsDiv.querySelectorAll('input').length;
+        function removeQuestion(qId) {
+            const qCard = document.getElementById(qId);
+            if (qCard) qCard.remove();
+            renumberQuestions();
+            reindexQuestions();
+        }
 
+        function renumberQuestions() {
+            const cards = document.querySelectorAll('#questions-container .card');
+            cards.forEach((card, idx) => {
+                const number = card.querySelector('.question-number');
+                if (number) number.textContent = `Question #${idx + 1}`;
+            });
+        }
+
+        function reindexQuestions() {
+            const cards = document.querySelectorAll('#questions-container .card');
+            cards.forEach((card, idx) => {
+                // Text
+                const text = card.querySelector('.question-text');
+                if (text) text.setAttribute('name', `Questions[${idx}].Text`);
+                // Points
+                const points = card.querySelector('.question-points');
+                if (points) points.setAttribute('name', `Questions[${idx}].Points`);
+                // Correct Answer
+                const correct = card.querySelector('.question-correct');
+                if (correct) correct.setAttribute('name', `Questions[${idx}].CorrectAnswer`);
+                // Options
+                const optionsDiv = card.querySelector('.question-options');
+                if (optionsDiv) {
+                    const options = optionsDiv.querySelectorAll('.question-option');
+                    options.forEach((opt, oidx) => {
+                        opt.setAttribute('name', `Questions[${idx}].Options[${oidx}]`);
+                    });
+                    // Add option button
+                    const addBtn = optionsDiv.querySelector('.add-option-btn');
+                    if (addBtn) {
+                        addBtn.onclick = function() {
+                            addOption(idx, optionsDiv);
+                        };
+                    }
+                }
+            });
+        }
+
+        function addOption(qIdx, optionsDiv) {
+            const optionCount = optionsDiv.querySelectorAll('.question-option').length;
             const optionInput = `
                 <div class="input-group mb-1">
-                    <input name="Questions[${qIndex}].Options[${optionCount}]" class="form-control" required />
+                    <input class="form-control question-option" required />
                 </div>
             `;
             optionsDiv.insertAdjacentHTML('beforeend', optionInput);
+            reindexQuestions();
         }
     </script>
 }

@@ -4,9 +4,11 @@
     ViewData["Title"] = "Exams List";
 }
 
-<h2>Exams</h2>
+<h2 class="mb-4 text-primary fw-bold">Exams</h2>
 
-<a class="btn btn-primary mb-3" asp-action="Create">Create New Exam</a>
+<div class="d-flex justify-content-end mb-3">
+    <a class="btn btn-primary" asp-action="Create">Create New Exam</a>
+</div>
 
 <table class="table table-bordered">
     <thead>

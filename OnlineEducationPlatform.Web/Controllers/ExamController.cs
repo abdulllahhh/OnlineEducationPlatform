@@ -6,7 +6,7 @@ using OnlineEducationPlatform.Infrastructure.Data;
 
 namespace OnlineEducationPlatform.Web.Controllers
 {
-    [Authorize(Roles = "Admin && Instructor")]
+    [Authorize(Roles = "Admin,Instructor")]
     public class ExamController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -161,21 +161,58 @@ namespace OnlineEducationPlatform.Web.Controllers
             exam.PassingScore = model.PassingScore;
             exam.ClassId = model.ClassId;
 
-            // Replace questions (simplified approach)
-            _context.Questions.RemoveRange(exam.Questions);
+            // Remove deleted questions
+            var incomingIds = model.Questions.Where(q => q.QuestionId != 0).Select(q => q.QuestionId).ToList();
+            var toRemove = exam.Questions.Where(q => !incomingIds.Contains(q.QuestionId)).ToList();
+            _context.Questions.RemoveRange(toRemove);
 
-            exam.Questions = model.Questions.Select(q => new Question
+            // Update or add questions
+            foreach (var q in model.Questions)
             {
-                Text = q.Text,
-                Points = q.Points,
-                CorrectAnswer = q.CorrectAnswer,
-                Options = q.Options
-            }).ToList();
+                if (q.QuestionId != 0)
+                {
+                    // Update existing
+                    var existing = exam.Questions.FirstOrDefault(x => x.QuestionId == q.QuestionId);
+                    if (existing != null)
+                    {
+                        existing.Text = q.Text;
+                        existing.Points = q.Points;
+                        existing.CorrectAnswer = q.CorrectAnswer;
+                        existing.Options = q.Options;
+                    }
+                }
+                else
+                {
+                    // Add new
+                    exam.Questions.Add(new Question
+                    {
+                        Text = q.Text,
+                        Points = q.Points,
+                        CorrectAnswer = q.CorrectAnswer,
+                        Options = q.Options,
+                        ExamId = exam.ExamId // Ensure new questions are linked to the exam
+                    });
+                }
+            }
 
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(int id)
+        {
+            var exam = _context.Exams.Include(e => e.Questions).FirstOrDefault(e => e.ExamId == id);
+            if (exam == null)
+            {
+                return NotFound();
+            }
+            _context.Questions.RemoveRange(exam.Questions);
+            _context.Exams.Remove(exam);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
 
 
     }
