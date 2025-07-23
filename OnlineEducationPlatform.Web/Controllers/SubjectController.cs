@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using OnlineEducationPlatform.Infrastructure.Data;
 
 namespace OnlineEducationPlatform.Web.Controllers
@@ -18,7 +19,8 @@ namespace OnlineEducationPlatform.Web.Controllers
             var s = _context.Subjects.ToList();
             if (s == null || !s.Any())
             {
-                return NotFound("No subjects found.");
+                var subjects = new List<SubjectViewModel>();
+                return View(subjects);
             }
             SubjectViewModel[] subjectViewModels = s.Select(subject => new SubjectViewModel
             {
@@ -28,6 +30,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             }).ToArray();
             return View(subjectViewModels);
         }
+
         [HttpGet]
         public IActionResult Create()
         {
