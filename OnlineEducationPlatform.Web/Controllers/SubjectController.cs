@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using OnlineEducationPlatform.Infrastructure.Data;
+using OnlineEducationPlatform.Web.Models;
+using System.Security.Claims;
 
 namespace OnlineEducationPlatform.Web.Controllers
 {
-    [Authorize(Roles ="Admin")]
+    [Authorize]
     public class SubjectController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -16,6 +18,7 @@ namespace OnlineEducationPlatform.Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             var s = _context.Subjects.ToList();
@@ -34,12 +37,14 @@ namespace OnlineEducationPlatform.Web.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create(SubjectViewModel subjectViewModel)
         {
             if (!ModelState.IsValid)
@@ -56,6 +61,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             return RedirectToAction("Index");
         }
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Delete(int id)
         {
             var subject = _context.Subjects.Find(id);
@@ -68,6 +74,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id)
         {
             var subject = _context.Subjects.Find(id);
@@ -85,6 +92,7 @@ namespace OnlineEducationPlatform.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Edit(int id, SubjectViewModel subjectViewModel)
         {
             if (!ModelState.IsValid)
@@ -103,42 +111,38 @@ namespace OnlineEducationPlatform.Web.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet]
-
-/*        [HttpPost]
-        public IActionResult AddClassToSubject(int subjectId, int classId)
-        {
-            var subject = _context.Subjects.Find(subjectId);
-            if (subject == null)
-            {
-                return NotFound();
-            }
-            var classSubject = new ClassSubject
-            {
-                SubjectId = subjectId,
-                ClassId = classId,
-                AddedDate = DateTime.Now
-            };
-            _context.ClassSubjects.Add(classSubject);
-            _context.SaveChanges();
-            return RedirectToAction("Details", new { id = subjectId });
-        }*/
+        [Authorize(Roles = "Admin,Instructor,Student")]
         public IActionResult Details(int id)
         {
             var subject = _context.Subjects.Find(id);
-
+            List<Assignment> assignments = new List<Assignment>();
             if (subject == null)
             {
                 return NotFound();
             }
 
-            var subjectClass = _context.ClassSubjects
-                .Include(cs => cs.Class)
-                .Where(cs => cs.SubjectId == id)
-                .ToList();
-            if (subjectClass == null)
+            if (User.IsInRole("Admin"))
             {
-                return NotFound();
+                assignments = _context.Assignments
+                .Where(a => a.SubjectId == subject.SubjectId)
+                .ToList();
             }
+            else if (User.IsInRole("Student"))
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var enrollment =  _context.Enrollments
+                                        .FirstOrDefault(u => u.StudentId == userId);
+                var classId = enrollment?.ClassId;
+                assignments = _context.Assignments.Where(a => a.ClassId == classId && a.SubjectId == subject.SubjectId).ToList(); ;
+            }
+            else if (User.IsInRole("Instructor"))
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var _class = _context.Classes.FirstOrDefault(c => c.TeacherId == userId);
+                var classId = _class?.ClassId;
+                assignments = _context.Assignments.Where(a => a.ClassId == classId && a.SubjectId == subject.SubjectId).ToList(); ;
+            }
+
             var subjectDetailsViewModel = new SubjectDetailsViewModel
             {
                 Id = subject.SubjectId,
@@ -148,10 +152,13 @@ namespace OnlineEducationPlatform.Web.Controllers
                     .Where(cs => cs.SubjectId == subject.SubjectId)
                     .Select(cs => cs.Class)
                     .ToList(),
+
                 AddedDate = _context.ClassSubjects
                     .Where(s => s.SubjectId == subject.SubjectId)
                     .Select(s => s.AddedDate)
-                    .ToList()
+                    .ToList(),
+
+                Assignments = assignments
             };
             return View(subjectDetailsViewModel);
         }

@@ -71,6 +71,7 @@ namespace OnlineEducationPlatform.Web.Controllers
                     await _roleManager.CreateAsync(new IdentityRole(model.Role));
 
                 await _userManager.AddToRoleAsync(user, model.Role);
+                Notification.SendNotification( _context ,user.Id, "Welcom to community");
                 return RedirectToAction("Index");
             }
 

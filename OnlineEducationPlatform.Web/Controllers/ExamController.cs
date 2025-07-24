@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineEducationPlatform.Infrastructure.Data;
+using System.Security.AccessControl;
 
 namespace OnlineEducationPlatform.Web.Controllers
 {
@@ -97,7 +98,8 @@ namespace OnlineEducationPlatform.Web.Controllers
 
             _context.Exams.Add(newExam);
             _context.SaveChanges();
-
+            SendNotificatons(exam.ClassId, "New exam has been added recentlly check it out");
+            _context.SaveChanges();
             TempData["Success"] = "Exam created successfully!";
             return RedirectToAction("Index");
         }
@@ -230,6 +232,8 @@ namespace OnlineEducationPlatform.Web.Controllers
             }
 
             _context.SaveChanges();
+            SendNotificatons(exam.ClassId, $"{exam.Title} exam has been updated recentlly check it out");
+            _context.SaveChanges();
             return RedirectToAction("Index");
         }
 
@@ -263,6 +267,18 @@ namespace OnlineEducationPlatform.Web.Controllers
                 .ToList();
             return Json(subjects);
         }
-
+        private void SendNotificatons(int classId, string message = "new exam notification")
+        {
+            var _class = _context.Classes.FirstOrDefault(Class => Class.ClassId == classId);
+            var studentsId = _context.Enrollments.Where(c => c.ClassId == classId).Select(s => s.StudentId);
+            if (_class != null && _class.TeacherId != null)
+            { 
+                Notification.SendNotification(_context, _class.TeacherId, message, "Exam Notification");
+            }
+            foreach (var studentId in studentsId) 
+            {
+                Notification.SendNotification(_context, studentId, message, "Exam Notification");
+            }
+        }
     }
 }

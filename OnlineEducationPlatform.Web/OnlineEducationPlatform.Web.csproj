@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Teacher\**" />
+    <Content Remove="Views\Teacher\**" />
+    <EmbeddedResource Remove="Views\Teacher\**" />
+    <None Remove="Views\Teacher\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.7">
@@ -23,7 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Views\Teacher\" />
     <Folder Include="wwwroot\Images\Books\" />
     <Folder Include="wwwroot\Books\" />
   </ItemGroup>

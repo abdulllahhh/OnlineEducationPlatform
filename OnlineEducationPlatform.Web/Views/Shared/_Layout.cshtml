@@ -58,6 +58,7 @@
             margin-bottom: 1rem;
         }
     </style>
+    @RenderSection("Styles", required: false)
 </head>
 <body>
     <header>
@@ -78,13 +79,21 @@
                             <li class="nav-item"><a class="nav-link" asp-controller="UserManagement" asp-action="Index">Manage Users</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Class" asp-action="Index">Classes</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Subject" asp-action="Index">Subjects</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="Exam" asp-action="Index">Exams</a></li>
                         }
                         @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="ManageAccount" asp-action="Index">My Account</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="ManageAccount" asp-action="Index">My Account</a></li>
                         }
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Student"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="StudentExam" asp-action="Index">Exams</a></li>
+                        }
+                        @if (User.Identity.IsAuthenticated && User.IsInRole("Instructor"))
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Exam" asp-action="Index">Exams</a></li>
+                        }
+                        <li class="nav-item"><a class="nav-link" asp-controller="Assignment" asp-action="Index">Assignment</a></li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Book" asp-action="Index">Books</a>
                         </li>

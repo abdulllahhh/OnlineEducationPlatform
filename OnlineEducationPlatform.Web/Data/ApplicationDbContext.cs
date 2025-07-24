@@ -31,6 +31,7 @@ namespace OnlineEducationPlatform.Infrastructure.Data
 
             modelBuilder.Entity<Notification>( entity =>
             {
+                entity.Property(n => n.Title).IsRequired(false);
                 entity.HasOne(n => n.User)
                       .WithMany(u => u.Notifications)
                       .HasForeignKey(n => n.UserId)
@@ -39,11 +40,12 @@ namespace OnlineEducationPlatform.Infrastructure.Data
             // Class Relationships
             modelBuilder.Entity<Class>(entity =>
             {
+                entity.Property(e => e.TeacherId).IsRequired(false);
                 // Class -> Teacher (One-to-Many)
                 entity.HasOne(c => c.Teacher)
                       .WithMany() // Optionally, you can add .WithMany(t => t.Classes) if you want reverse navigation
                       .HasForeignKey(c => c.TeacherId)
-                      .OnDelete(DeleteBehavior.Restrict);
+                      .OnDelete(DeleteBehavior.SetNull);
 
                 // Class -> Exams (One-to-Many)
                 entity.HasMany(c => c.Exams)
