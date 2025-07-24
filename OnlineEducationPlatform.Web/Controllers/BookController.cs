@@ -105,7 +105,7 @@ namespace OnlineEducationPlatform.Web.Controllers
                 // save image file
                 var imageExt = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
                 var imageFileName = $"bookimg_{Guid.NewGuid()}{imageExt}";
-                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot","Images" ,"Books", imageFileName);
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot","Books", imageFileName);
                 Directory.CreateDirectory(Path.GetDirectoryName(imagePath));
                 using (var stream = new FileStream(imagePath, FileMode.Create))
                 {
@@ -186,7 +186,7 @@ namespace OnlineEducationPlatform.Web.Controllers
                     return View(book);
                 }
                 var imageFileName = $"bookimg_{Guid.NewGuid()}{imageExt}";
-                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot","Images","Books", imageFileName);
+                var imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot","Books", imageFileName);
                 Directory.CreateDirectory(Path.GetDirectoryName(imagePath));
                 using (var stream = new FileStream(imagePath, FileMode.Create))
                 {
