@@ -27,7 +27,19 @@ namespace OnlineEducationPlatform.Infrastructure.Data
         {
 
             modelBuilder.Entity<ClassSubject>().HasKey(cs => new { cs.ClassId, cs.SubjectId });
-            modelBuilder.Entity<AssignmentSubmission>().HasKey(asb => new { asb.AssignmentId, asb.StudentId });
+            modelBuilder.Entity<AssignmentSubmission>()
+                .HasKey(asb => new { asb.AssignmentId, asb.StudentId });
+
+            modelBuilder.Entity<AssignmentSubmission>()
+                .Property(p => p.Score)
+                .HasPrecision(18,2);
+            modelBuilder.Entity<ExamSubmission>()
+                .Property(p => p.Score)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Question>()
+                .Property(p => p.Points)
+                .HasPrecision(18, 2);
 
             modelBuilder.Entity<Notification>( entity =>
             {

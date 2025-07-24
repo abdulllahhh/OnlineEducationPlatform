@@ -15,6 +15,9 @@ namespace OnlineEducationPlatform.Web
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions => sqlOptions.EnableRetryOnFailure());
             });
 
             
@@ -93,6 +96,11 @@ namespace OnlineEducationPlatform.Web
                         await userManager.AddToRoleAsync(newAdmin, "Admin");
                     }
                 }
+            }
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                db.Database.Migrate();
             }
             app.Run();
 
