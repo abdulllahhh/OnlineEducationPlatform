@@ -16,21 +16,26 @@ namespace OnlineEducationPlatform.Web.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Index()
         {
-            var exams = _context.Exams.Include(e => e.Class).ToList();
+            var exams = _context.Exams.Include(s => s.Subject).Include(e => e.Class).ToList();
 
             return View(exams);
         }
 
+
         [HttpGet]
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Create()
         {
             var classes = _context.Classes.ToList();
-            if (!classes.Any())
-            {
-                return NotFound("No classes found.");
-            }
+            var subjects = _context.Subjects.ToList();
+
+            //if (!classes.Any())
+            //{
+            //    return NotFound("No classes found.");
+            //}
 
             var examViewModel = new ExamViewModel
             {
@@ -38,6 +43,12 @@ namespace OnlineEducationPlatform.Web.Controllers
                 {
                     Value = c.ClassId.ToString(),
                     Text = c.ClassName
+                }).ToList(),
+
+                Subjects = subjects.Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
                 }).ToList()
             };
 
@@ -46,6 +57,7 @@ namespace OnlineEducationPlatform.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Create(ExamViewModel exam)
         {
             if (!ModelState.IsValid)
@@ -59,6 +71,12 @@ namespace OnlineEducationPlatform.Web.Controllers
                 {
                     ModelState.AddModelError("", "Available From must be earlier than Available To.");
                 }
+
+                exam.Subjects = _context.Subjects.Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
+                }).ToList();
                 return View(exam);
             }
 
@@ -71,6 +89,7 @@ namespace OnlineEducationPlatform.Web.Controllers
                 TimeLimitMinutes = exam.TimeLimitMinutes,
                 PassingScore = exam.PassingScore,
                 ClassId = exam.ClassId,
+                SubjectId = exam.SubjectId,
                 Questions = exam.Questions?.Select(q => new Question
                 {
                     CorrectAnswer = q.CorrectAnswer,
@@ -86,10 +105,12 @@ namespace OnlineEducationPlatform.Web.Controllers
             TempData["Success"] = "Exam created successfully!";
             return RedirectToAction("Index");
         }
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Details(int id)
         {
             var exam = _context.Exams
                 .Include(e => e.Class)
+                .Include(s => s.Subject)
                 .Include(e => e.Questions)
                 .FirstOrDefault(e => e.ExamId == id);
 
@@ -101,6 +122,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             return View(exam);
         }
         [HttpGet]
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Edit(int id)
         {
             var exam = _context.Exams
@@ -119,6 +141,7 @@ namespace OnlineEducationPlatform.Web.Controllers
                 TimeLimitMinutes = exam.TimeLimitMinutes,
                 PassingScore = exam.PassingScore,
                 ClassId = exam.ClassId,
+                SubjectId = exam.SubjectId,
                 Questions = exam.Questions.Select(q => new QuestionViewModel
                 {
                     QuestionId = q.QuestionId,
@@ -131,12 +154,18 @@ namespace OnlineEducationPlatform.Web.Controllers
                 {
                     Value = c.ClassId.ToString(),
                     Text = c.ClassName
+                }).ToList(),
+                Subjects = _context.Subjects.Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
                 }).ToList()
             };
 
             return View(viewModel);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Edit(ExamViewModel model)
         {
             if (!ModelState.IsValid)
@@ -146,6 +175,12 @@ namespace OnlineEducationPlatform.Web.Controllers
                     Value = c.ClassId.ToString(),
                     Text = c.ClassName
                 }).ToList();
+                model.Subjects = _context.Subjects.Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
+                }).ToList();
+
                 return View(model);
             }
             if (model.AvailableFrom >= model.AvailableTo)
@@ -167,22 +202,74 @@ namespace OnlineEducationPlatform.Web.Controllers
             exam.PassingScore = model.PassingScore;
             exam.ClassId = model.ClassId;
 
-            // Replace questions (simplified approach)
-            _context.Questions.RemoveRange(exam.Questions);
+            // Remove deleted questions
+            var incomingIds = model.Questions.Where(q => q.QuestionId != 0).Select(q => q.QuestionId).ToList();
+            var toRemove = exam.Questions.Where(q => !incomingIds.Contains(q.QuestionId)).ToList();
+            _context.Questions.RemoveRange(toRemove);
 
-            exam.Questions = model.Questions.Select(q => new Question
+            // Update or add questions
+            foreach (var q in model.Questions)
             {
-                Text = q.Text,
-                Points = q.Points,
-                CorrectAnswer = q.CorrectAnswer,
-                Options = q.Options
-            }).ToList();
+                if (q.QuestionId != 0)
+                {
+                    // Update existing
+                    var existing = exam.Questions.FirstOrDefault(x => x.QuestionId == q.QuestionId);
+                    if (existing != null)
+                    {
+                        existing.Text = q.Text;
+                        existing.Points = q.Points;
+                        existing.CorrectAnswer = q.CorrectAnswer;
+                        existing.Options = q.Options;
+                    }
+                }
+                else
+                {
+                    // Add new
+                    exam.Questions.Add(new Question
+                    {
+                        Text = q.Text,
+                        Points = q.Points,
+                        CorrectAnswer = q.CorrectAnswer,
+                        Options = q.Options,
+                        ExamId = exam.ExamId // Ensure new questions are linked to the exam
+                    });
+                }
+            }
 
             _context.SaveChanges();
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Instructor")]
+        public IActionResult Delete(int id)
+        {
+            var exam = _context.Exams.Include(e => e.Questions).FirstOrDefault(e => e.ExamId == id);
+            if (exam == null)
+            {
+                return NotFound();
+            }
+            _context.Questions.RemoveRange(exam.Questions);
+            _context.Exams.Remove(exam);
+            _context.SaveChanges();
+            return RedirectToAction("Index");
+        }
 
+        [HttpGet]
+        [Authorize(Roles = "Admin,Instructor")]
+        public JsonResult GetSubjectsForClass(int classId)
+        {
+            var subjectIds = _context.ClassSubjects
+                .Where(cs => cs.ClassId == classId)
+                .Select(cs => cs.SubjectId)
+                .ToList();
+            var subjects = _context.Subjects
+                .Where(s => subjectIds.Contains(s.SubjectId))
+                .Select(s => new { s.SubjectId, s.Name })
+                .ToList();
+            return Json(subjects);
+        }
 
     }
 }

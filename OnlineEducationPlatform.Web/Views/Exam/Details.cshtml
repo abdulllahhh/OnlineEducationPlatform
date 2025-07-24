@@ -4,42 +4,65 @@
     ViewData["Title"] = "Exam Details";
 }
 
-<h2>Exam Details</h2>
-
-<div class="card p-3 mb-4">
-    <h4>@Model.Title</h4>
-    <p><strong>Class:</strong> @Model.Class?.ClassName</p>
-    <p><strong>Instructions:</strong> @Model.Instructions</p>
-    <p><strong>Available From:</strong> @Model.AvailableFrom.ToString("yyyy-MM-dd HH:mm")</p>
-    <p><strong>Available To:</strong> @Model.AvailableTo.ToString("yyyy-MM-dd HH:mm")</p>
-    <p><strong>Time Limit:</strong> @Model.TimeLimitMinutes minutes</p>
-    <p><strong>Passing Score:</strong> @Model.PassingScore</p>
-</div>
-
-@if (Model.Questions != null && Model.Questions.Any())
-{
-    <h4>Questions</h4>
-    <ol>
-        @foreach (var q in Model.Questions)
-        {
-            <li class="mb-3">
-                <p><strong>Text:</strong> @q.Text</p>
-                <p><strong>Points:</strong> @q.Points</p>
-                <p><strong>Options:</strong></p>
-                <ul>
-                    @foreach (var option in q.Options)
+<div class="row justify-content-center" style="min-height: 70vh;">
+    <div class="col-md-5">
+        <div class="card shadow p-4 mb-4" style="background: #f9fafc; border-radius: 1.5rem;">
+            <h2 class="mb-4 text-primary">Exam Details</h2>
+            <div class="mb-3">
+                <span class="fw-bold text-secondary">Title:</span> <span class="ms-2">@Model.Title</span>
+            </div>
+            <div class="mb-3">
+                <span class="fw-bold text-secondary">Class:</span> <span class="ms-2">@Model.Class?.ClassName</span>
+            </div>
+            <div class="mb-3">
+                <span class="fw-bold text-secondary">Subject:</span> <span class="ms-2">@Model.Subject?.Name</span>
+            </div>
+            <div class="mb-3">
+                <span class="fw-bold text-secondary">Instructions:</span> <span class="ms-2">@Model.Instructions</span>
+            </div>
+            <div class="mb-3">
+                <span class="fw-bold text-secondary">Available From:</span> <span class="ms-2">@Model.AvailableFrom.ToString("yyyy-MM-dd HH:mm")</span>
+            </div>
+            <div class="mb-3">
+                <span class="fw-bold text-secondary">Available To:</span> <span class="ms-2">@Model.AvailableTo.ToString("yyyy-MM-dd HH:mm")</span>
+            </div>
+            <div class="mb-3">
+                <span class="fw-bold text-secondary">Time Limit:</span> <span class="ms-2">@Model.TimeLimitMinutes minutes</span>
+            </div>
+            <div class="mb-3">
+                <span class="fw-bold text-secondary">Passing Score:</span> <span class="ms-2">@Model.PassingScore</span>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-primary w-100 mt-3">Back to List</a>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="card shadow p-4" style="background: #f9fafc; border-radius: 1.5rem; min-height: 300px;">
+            <h4 class="text-primary mb-3">Questions</h4>
+            @if (Model.Questions != null && Model.Questions.Any())
+            {
+                <ol class="ps-3">
+                    @foreach (var q in Model.Questions)
                     {
-                        <li>@option</li>
+                        <li class="mb-3">
+                            <div class="mb-1"><span class="fw-bold text-secondary">Text:</span> <span class="ms-2">@q.Text</span></div>
+                            <div class="mb-1"><span class="fw-bold text-secondary">Points:</span> <span class="ms-2">@q.Points</span></div>
+                            <div class="mb-1"><span class="fw-bold text-secondary">Options:</span>
+                                <ul class="ms-4">
+                                    @foreach (var option in q.Options)
+                                    {
+                                        <li>@option</li>
+                                    }
+                                </ul>
+                            </div>
+                            <div class="mb-1"><span class="fw-bold text-secondary">Correct Answer:</span> <span class="ms-2">@q.CorrectAnswer</span></div>
+                        </li>
                     }
-                </ul>
-                <p><strong>Correct Answer:</strong> @q.CorrectAnswer</p>
-            </li>
-        }
-    </ol>
-}
-else
-{
-    <p>No questions added yet.</p>
-}
-
-<a asp-action="Index" class="btn btn-secondary mt-3">Back to List</a>
+                </ol>
+            }
+            else
+            {
+                <p class="text-muted">No questions added yet.</p>
+            }
+        </div>
+    </div>
+</div>
