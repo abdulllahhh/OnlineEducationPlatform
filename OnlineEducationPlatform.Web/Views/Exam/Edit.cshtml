@@ -3,6 +3,8 @@
     ViewData["Title"] = "Edit Exam";
 }
 
+<div asp-validation-summary="All" class="alert alert-danger"></div>
+
 <div class="row justify-content-center" style="min-height: 70vh;">
     <form asp-action="Edit" method="post" onsubmit="reindexQuestions()" class="row w-100">
         <div class="col-md-5">
@@ -36,7 +38,11 @@
                 </div>
                 <div class="mb-3">
                     <label asp-for="ClassId" class="form-label text-secondary"></label>
-                    <select asp-for="ClassId" asp-items="Model.Classes" class="form-control"></select>
+                    <select asp-for="ClassId" asp-items="Model.Classes" class="form-control" id="classSelect"></select>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="SubjectId" class="form-label text-secondary"></label>
+                    <select asp-for="SubjectId" asp-items="Model.Subjects" class="form-control" id="subjectSelect"></select>
                 </div>
                 <button type="submit" class="btn btn-primary w-100 mt-4">Save Changes</button>
                 <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
@@ -171,5 +177,37 @@
             optionsDiv.insertAdjacentHTML('beforeend', optionInput);
             reindexQuestions();
         }
+
+        function updateSubjectsForClass(classId, selectedSubjectId) {
+            fetch('/Exam/GetSubjectsForClass?classId=' + classId)
+                .then(response => response.json())
+                .then(subjects => {
+                    var subjectSelect = document.getElementById('subjectSelect');
+                    subjectSelect.innerHTML = '';
+                    subjects.forEach(function(subj) {
+                        var opt = document.createElement('option');
+                        opt.value = subj.subjectId;
+                        opt.textContent = subj.name;
+                        if (selectedSubjectId && subj.subjectId == selectedSubjectId) {
+                            opt.selected = true;
+                        }
+                        subjectSelect.appendChild(opt);
+                    });
+                });
+        }
+        document.getElementById('classSelect').addEventListener('change', function() {
+            updateSubjectsForClass(this.value);
+        });
+        // On page load, filter subjects for the initial class
+        document.addEventListener('DOMContentLoaded', function() {
+            var classSelect = document.getElementById('classSelect');
+            var subjectSelect = document.getElementById('subjectSelect');
+            var selectedSubjectId = subjectSelect.value;
+            if (classSelect.value) {
+                updateSubjectsForClass(classSelect.value, selectedSubjectId);
+            } else {
+                subjectSelect.innerHTML = '';
+            }
+        });
     </script>
 }

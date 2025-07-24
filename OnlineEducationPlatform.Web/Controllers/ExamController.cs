@@ -6,7 +6,7 @@ using OnlineEducationPlatform.Infrastructure.Data;
 
 namespace OnlineEducationPlatform.Web.Controllers
 {
-    [Authorize(Roles = "Admin,Instructor")]
+    
     public class ExamController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -16,21 +16,26 @@ namespace OnlineEducationPlatform.Web.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Index()
         {
-            var exams = _context.Exams.Include(e => e.Class).ToList();
+            var exams = _context.Exams.Include(s => s.Subject).Include(e => e.Class).ToList();
 
             return View(exams);
         }
+        
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Create()
         {
             var classes = _context.Classes.ToList();
-            if (!classes.Any())
-            {
-                return NotFound("No classes found.");
-            }
+            var subjects = _context.Subjects.ToList();
+
+            //if (!classes.Any())
+            //{
+            //    return NotFound("No classes found.");
+            //}
 
             var examViewModel = new ExamViewModel
             {
@@ -38,6 +43,12 @@ namespace OnlineEducationPlatform.Web.Controllers
                 {
                     Value = c.ClassId.ToString(),
                     Text = c.ClassName
+                }).ToList(),
+
+                Subjects = subjects.Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
                 }).ToList()
             };
 
@@ -46,6 +57,7 @@ namespace OnlineEducationPlatform.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Create(ExamViewModel exam)
         {
             if (!ModelState.IsValid)
@@ -56,6 +68,11 @@ namespace OnlineEducationPlatform.Web.Controllers
                     Text = c.ClassName
                 }).ToList();
 
+                exam.Subjects = _context.Subjects.Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
+                }).ToList();
                 return View(exam);
             }
 
@@ -68,6 +85,7 @@ namespace OnlineEducationPlatform.Web.Controllers
                 TimeLimitMinutes = exam.TimeLimitMinutes,
                 PassingScore = exam.PassingScore,
                 ClassId = exam.ClassId,
+                SubjectId = exam.SubjectId,
                 Questions = exam.Questions?.Select(q => new Question
                 {
                     CorrectAnswer = q.CorrectAnswer,
@@ -83,10 +101,12 @@ namespace OnlineEducationPlatform.Web.Controllers
             TempData["Success"] = "Exam created successfully!";
             return RedirectToAction("Index");
         }
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Details(int id)
         {
             var exam = _context.Exams
                 .Include(e => e.Class)
+                .Include(s => s.Subject)
                 .Include(e => e.Questions)
                 .FirstOrDefault(e => e.ExamId == id);
 
@@ -98,6 +118,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             return View(exam);
         }
         [HttpGet]
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Edit(int id)
         {
             var exam = _context.Exams
@@ -116,6 +137,7 @@ namespace OnlineEducationPlatform.Web.Controllers
                 TimeLimitMinutes = exam.TimeLimitMinutes,
                 PassingScore = exam.PassingScore,
                 ClassId = exam.ClassId,
+                SubjectId = exam.SubjectId,
                 Questions = exam.Questions.Select(q => new QuestionViewModel
                 {
                     QuestionId = q.QuestionId,
@@ -128,12 +150,18 @@ namespace OnlineEducationPlatform.Web.Controllers
                 {
                     Value = c.ClassId.ToString(),
                     Text = c.ClassName
+                }).ToList(),
+                Subjects = _context.Subjects.Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
                 }).ToList()
             };
 
             return View(viewModel);
         }
         [HttpPost]
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Edit(ExamViewModel model)
         {
             if (!ModelState.IsValid)
@@ -143,6 +171,12 @@ namespace OnlineEducationPlatform.Web.Controllers
                     Value = c.ClassId.ToString(),
                     Text = c.ClassName
                 }).ToList();
+                model.Subjects = _context.Subjects.Select(s => new SelectListItem
+                {
+                    Value = s.SubjectId.ToString(),
+                    Text = s.Name
+                }).ToList();
+
                 return View(model);
             }
 
@@ -201,6 +235,7 @@ namespace OnlineEducationPlatform.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Instructor")]
         public IActionResult Delete(int id)
         {
             var exam = _context.Exams.Include(e => e.Questions).FirstOrDefault(e => e.ExamId == id);
@@ -214,6 +249,20 @@ namespace OnlineEducationPlatform.Web.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpGet]
+        [Authorize(Roles = "Admin,Instructor")]
+        public JsonResult GetSubjectsForClass(int classId)
+        {
+            var subjectIds = _context.ClassSubjects
+                .Where(cs => cs.ClassId == classId)
+                .Select(cs => cs.SubjectId)
+                .ToList();
+            var subjects = _context.Subjects
+                .Where(s => subjectIds.Contains(s.SubjectId))
+                .Select(s => new { s.SubjectId, s.Name })
+                .ToList();
+            return Json(subjects);
+        }
 
     }
 }
