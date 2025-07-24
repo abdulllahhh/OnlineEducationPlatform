@@ -173,6 +173,10 @@ namespace OnlineEducationPlatform.Web.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
@@ -252,7 +256,6 @@ namespace OnlineEducationPlatform.Web.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TeacherId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ClassId");
@@ -394,7 +397,6 @@ namespace OnlineEducationPlatform.Web.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
@@ -624,8 +626,7 @@ namespace OnlineEducationPlatform.Web.Migrations
                     b.HasOne("OnlineEducationPlatform.Web.Users.ApplicationUser", "Teacher")
                         .WithMany()
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Teacher");
                 });
