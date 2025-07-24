@@ -22,7 +22,7 @@ namespace OnlineEducationPlatform.Web.Controllers
 
             var exams = _context.Exams
                 .Include(e => e.Submissions)
-                .Where(e => DateTime.Now >= e.AvailableFrom && DateTime.Now <= e.AvailableTo)
+                .Where(e => DateTime.Now <= e.AvailableTo)
                 .Select(e => new ExamListItemViewModel
                 {
                     ExamId = e.ExamId,
