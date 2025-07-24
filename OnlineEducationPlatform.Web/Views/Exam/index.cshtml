@@ -4,15 +4,18 @@
     ViewData["Title"] = "Exams List";
 }
 
-<h2>Exams</h2>
+<h2 class="mb-4 text-primary fw-bold">Exams</h2>
 
-<a class="btn btn-primary mb-3" asp-action="Create">Create New Exam</a>
+<div class="d-flex justify-content-end mb-3">
+    <a class="btn btn-primary" asp-action="Create">Create New Exam</a>
+</div>
 
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Title</th>
             <th>Class</th>
+            <th>Subject</th>
             <th>Available From</th>
             <th>Available To</th>
             <th>Time Limit (mins)</th>
@@ -26,6 +29,7 @@
             <tr>
                 <td>@exam.Title</td>
                 <td>@exam.Class?.ClassName</td>
+                <td>@exam.Subject?.Name</td>
                 <td>@exam.AvailableFrom.ToString("yyyy-MM-dd")</td>
                 <td>@exam.AvailableTo.ToString("yyyy-MM-dd")</td>
                 <td>@exam.TimeLimitMinutes</td>
@@ -37,6 +41,10 @@
                         <button class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                     </form>
 
+                    @if (User.Identity.IsAuthenticated && User.IsInRole("Student"))
+                    {
+                        <a asp-controller="StudentExam" asp-action="Solve" asp-route-id="@exam.ExamId" class="btn btn-sm btn-outline-primary">Solve</a>
+                    }
                 </td>
             </tr>
         }

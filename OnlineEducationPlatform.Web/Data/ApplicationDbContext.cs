@@ -65,6 +65,12 @@ namespace OnlineEducationPlatform.Infrastructure.Data
 
             modelBuilder.Entity<Subject>(entity =>
             {
+                // Subject -> Exams (One-to-Many)
+                entity.HasMany(s => s.Exams)
+                      .WithOne(e => e.Subject)
+                      .HasForeignKey(e => e.SubjectId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
                 // Class -> ClassSubject (One-to-Many)
                 entity.HasMany(c => c.Classes)
                       .WithOne(e => e.Subject)
@@ -81,6 +87,7 @@ namespace OnlineEducationPlatform.Infrastructure.Data
             // Exam Relationships
             modelBuilder.Entity<Exam>(entity =>
             {
+
                 // Exam -> Questions (One-to-Many)
                 entity.HasMany(e => e.Questions)
                       .WithOne(q => q.Exam)

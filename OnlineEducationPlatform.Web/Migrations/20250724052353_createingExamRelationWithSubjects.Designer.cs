@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineEducationPlatform.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using OnlineEducationPlatform.Infrastructure.Data;
 namespace OnlineEducationPlatform.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250724052353_createingExamRelationWithSubjects")]
+    partial class createingExamRelationWithSubjects
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -350,10 +353,6 @@ namespace OnlineEducationPlatform.Web.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Answers")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AnswersJson")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal?>("Score")

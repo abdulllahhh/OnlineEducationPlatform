@@ -124,3 +124,8 @@
 
 
 }
+@if (User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+{
+    @await Html.PartialAsync("AdminDashboard")
+}
+

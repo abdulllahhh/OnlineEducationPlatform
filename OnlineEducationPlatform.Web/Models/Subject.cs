@@ -9,6 +9,7 @@
         // Many-to-many with Class
         public ICollection<ClassSubject> Classes { get; set; }
         public ICollection<Assignment> Assignments { get; set; }
+        public ICollection<Exam> Exams { get; set; }
 
     }
 }
