@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OnlineEducationPlatform.Web.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class configureEntireProject : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -338,7 +338,8 @@ namespace OnlineEducationPlatform.Web.Migrations
                     AvailableTo = table.Column<DateTime>(type: "TEXT", nullable: false),
                     TimeLimitMinutes = table.Column<int>(type: "INTEGER", nullable: false),
                     PassingScore = table.Column<int>(type: "INTEGER", nullable: false),
-                    ClassId = table.Column<int>(type: "INTEGER", nullable: false)
+                    ClassId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SubjectId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -348,6 +349,12 @@ namespace OnlineEducationPlatform.Web.Migrations
                         column: x => x.ClassId,
                         principalTable: "Classes",
                         principalColumn: "ClassId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Exams_Subjects_SubjectId",
+                        column: x => x.SubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "SubjectId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -467,6 +474,11 @@ namespace OnlineEducationPlatform.Web.Migrations
                 column: "ClassId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Exams_SubjectId",
+                table: "Exams",
+                column: "SubjectId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExamSubmissions_StudentId",
                 table: "ExamSubmissions",
                 column: "StudentId");
@@ -528,13 +540,13 @@ namespace OnlineEducationPlatform.Web.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Subjects");
-
-            migrationBuilder.DropTable(
                 name: "Exams");
 
             migrationBuilder.DropTable(
                 name: "Classes");
+
+            migrationBuilder.DropTable(
+                name: "Subjects");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

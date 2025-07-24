@@ -305,7 +305,7 @@ namespace OnlineEducationPlatform.Web.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("SubjectId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("TimeLimitMinutes")
                         .HasColumnType("INTEGER");
