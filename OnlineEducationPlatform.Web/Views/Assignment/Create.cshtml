@@ -24,6 +24,11 @@
                             <span asp-validation-for="Description" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
+                            <label asp-for="TotalScore" class="form-label text-secondary"></label>
+                            <input asp-for="TotalScore" class="form-control" type="number" min="1" />
+                            <span asp-validation-for="TotalScore" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
                             <label asp-for="DueDate" class="form-label text-secondary"></label>
                             <input asp-for="DueDate" class="form-control" type="datetime-local" min="@now" value="@(Model.DueDate == DateTime.MinValue ? now : Model.DueDate.ToString("yyyy-MM-ddTHH:mm"))" />
                             <span asp-validation-for="DueDate" class="text-danger"></span>
@@ -57,7 +62,7 @@
 @section Scripts {
     <script>
         document.getElementById('classSelect').addEventListener('change', function() {
-            fetch('/Assignment/GetSubjectsForClass?classId=' + this.value)
+            fetch('/ClassSubject/GetSubjectsForClass?classId=' + this.value)
                 .then(response => response.json())
                 .then(subjects => {
                     var subjectSelect = document.getElementById('subjectSelect');

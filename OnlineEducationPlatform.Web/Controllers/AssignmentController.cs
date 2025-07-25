@@ -27,7 +27,7 @@ namespace OnlineEducationPlatform.Web.Controllers
         }
 
         // GET: Assignment
-        [Authorize(Roles = "Admin,Instructor,Student")]
+        [Authorize(Roles = "Admin,Instructor")]
         public async Task<IActionResult> Index()
         {
             var assignments = new List<Assignment>();
@@ -37,17 +37,6 @@ namespace OnlineEducationPlatform.Web.Controllers
                     .Include(a => a.Class)
                     .Include(a => a.Subject)
                     .ToListAsync();
-            }
-            else if (User.IsInRole("Student"))
-            {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var enrollment = _context.Enrollments
-                                        .FirstOrDefault(u => u.StudentId == userId);
-                var classId = enrollment?.ClassId;
-                assignments = _context.Assignments
-                    .Include(a => a.Class)
-                    .Include(a => a.Subject)
-                    .Where(a => a.ClassId == classId).ToList(); ;
             }
             else if (User.IsInRole("Instructor"))
             {
@@ -134,7 +123,8 @@ namespace OnlineEducationPlatform.Web.Controllers
                 DueDate = model.DueDate,
                 ClassId = model.ClassId,
                 SubjectId = model.SubjectId,
-                FilePath = filePath != null ? $"/Assignments/{Path.GetFileName(filePath)}" : null
+                FilePath = filePath != null ? $"/Assignments/{Path.GetFileName(filePath)}" : null,
+                TotalScore = model.TotalScore
             };
             _context.Add(assignment);
             var subject = _context.Subjects.FirstOrDefault( s=> s.SubjectId == model.SubjectId );
@@ -219,6 +209,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             assignment.DueDate = model.DueDate;
             assignment.ClassId = model.ClassId;
             assignment.SubjectId = model.SubjectId;
+            assignment.TotalScore = model.TotalScore;
 
             if (model.AssignmentFile != null)
             {
@@ -276,18 +267,6 @@ namespace OnlineEducationPlatform.Web.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
-        [Authorize(Roles = "Instructor")]
-        public JsonResult GetSubjectsForClass(int classId)
-        {
-            var subjects = _context.ClassSubjects
-                .Where(cs => cs.ClassId == classId)
-                .Select(cs => cs.Subject)
-                .Select(s => new { s.SubjectId, s.Name })
-                .ToList();
-            return Json(subjects);
         }
 
         private void SendNotificaion(int classId, int SubjectId,string message = "new assignment notification")

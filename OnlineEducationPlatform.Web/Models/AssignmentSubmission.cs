@@ -7,5 +7,7 @@
         public string FilePath { get; set; }
         public DateTime SubmittedAt { get; set; }
         public decimal? Score { get; set; }
+        public Assignment Assignment { get; set; }
+        public Student Student { get; set; }
     }
 }

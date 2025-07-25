@@ -16,48 +16,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/OnlineEducationPlatform.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-        }
-        .card {
-            border-radius: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        footer {
-            background: #fff;
-            border-top: 1px solid #eaeaea;
-        }
-        /* Notification overlay and panel */
-        #notificationOverlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.4);
-            z-index: 1050;
-        }
-        #notificationPanel {
-            display: none;
-            position: fixed;
-            top: 80px;
-            right: 40px;
-            width: 350px;
-            max-width: 90vw;
-            background: #fff;
-            border-radius: 1rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-            z-index: 1060;
-            padding: 1.5rem 1rem;
-        }
-        #notificationPanel .panel-header {
-            font-weight: bold;
-            font-size: 1.1rem;
-            margin-bottom: 1rem;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
     @RenderSection("Styles", required: false)
 </head>
 <body>
@@ -79,7 +39,6 @@
                             <li class="nav-item"><a class="nav-link" asp-controller="UserManagement" asp-action="Index">Manage Users</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Class" asp-action="Index">Classes</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Subject" asp-action="Index">Subjects</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-controller="Exam" asp-action="Index">Exams</a></li>
                         }
                         @if (User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
                         {
@@ -88,12 +47,13 @@
                         @if (User.Identity.IsAuthenticated && User.IsInRole("Student"))
                         {
                             <li class="nav-item"><a class="nav-link" asp-controller="StudentExam" asp-action="Index">Exams</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-controller="StudentAssignment" asp-action="Index">Assignment</a></li>
                         }
-                        @if (User.Identity.IsAuthenticated && User.IsInRole("Instructor"))
+                        @if (User.Identity.IsAuthenticated && (User.IsInRole("Admin") || User.IsInRole("Instructor")))
                         {
+                            <li class="nav-item"><a class="nav-link" asp-controller="Assignment" asp-action="Index">Assignment</a></li>
                             <li class="nav-item"><a class="nav-link" asp-controller="Exam" asp-action="Index">Exams</a></li>
                         }
-                        <li class="nav-item"><a class="nav-link" asp-controller="Assignment" asp-action="Index">Assignment</a></li>
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Book" asp-action="Index">Books</a>
                         </li>
