@@ -13,7 +13,8 @@ namespace OnlineEducationPlatform.Web.ViewModels
         public string AssignmentPath { get; set; }
         public string? SubmitionPath { get; set; }
         public bool HasSubmitted { get; set; }
-        public decimal? Score { get; set; }
+        public int TotalScore { get; set; }
+        public int? Score { get; set; }
         public IFormFile AssignmentFile { get; set; }
         public IFormFile SubmissionFile { get; set; }
     }

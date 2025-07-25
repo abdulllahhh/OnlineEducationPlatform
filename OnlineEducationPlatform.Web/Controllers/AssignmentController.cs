@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using OnlineEducationPlatform.Infrastructure.Data;
 using OnlineEducationPlatform.Web.Models;
 using OnlineEducationPlatform.Web.ViewModels;
@@ -276,6 +277,79 @@ namespace OnlineEducationPlatform.Web.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+        [HttpGet]
+        [Authorize(Roles = "Instructor")]
+        public async Task<IActionResult> Grade(int id)
+        {
+            var assignment = await _context.Assignments
+                .Include(a => a.Class)
+                    .ThenInclude(c => c.Enrollments)
+                        .ThenInclude(e => e.Student)
+                .FirstOrDefaultAsync(a => a.AssignmentId == id);
+
+            if (assignment == null)
+                return NotFound();
+
+            var studentsId = _context.Enrollments.Where(c => c.ClassId == assignment.ClassId).Select(s => s.StudentId);
+            var students = _context.Users.Where(u => studentsId.Contains(u.Id));
+            var Assignmintsubmitions = _context.AssignmentSubmission.Where(u => studentsId.Contains(u.StudentId));
+
+            var studentGrades = students.Select(s => new StudentGradeViewModel
+            {
+                StudintId = s.Id,
+                StudentName = s.FullName,
+                StudentEmail = s.Email,
+                IsSubmitted = Assignmintsubmitions.Any(_as => _as.StudentId == s.Id),
+                Score = Assignmintsubmitions
+                            .Any(_as => _as.StudentId == s.Id)
+                            ? Assignmintsubmitions
+                                .FirstOrDefault(_as => _as.StudentId == s.Id).Score
+                            : (int?)null
+            }).ToList();
+
+            var assignmentGrades = new AssignmentGradeViewModel
+            {
+                AssignmentId = assignment.AssignmentId,
+                AssignmentName = assignment.Title,
+                TotalScore = assignment.TotalScore,
+                ClassId = assignment.ClassId,
+                ClassName = assignment.Class.ClassName,
+                DueDate = assignment.DueDate,
+                StudentGrades = studentGrades
+            };
+
+            return View(assignmentGrades);
+        }
+        [HttpPost]
+        [Authorize(Roles = "Instructor")]
+        public async Task<IActionResult> Grade([FromBody] GradeScoresRequest request)
+        {
+            if (request == null || request.Scores == null)
+                return Json(new { success = false, error = "No scores submitted." });
+            foreach (var item in request.Scores)
+            {
+                var submission = await _context.AssignmentSubmission
+                            .FirstOrDefaultAsync(s => s.AssignmentId == request.AssignmentId && s.StudentId == item.StudentId);
+                if (submission != null)
+                {
+                    submission.Score = int.TryParse(item.Score, out var scoreVal) ? scoreVal : (int?)null;
+                }
+                
+            }
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
+        }
+
+        public class GradeScoresRequest
+        {
+            public int AssignmentId { get; set; }
+            public List<StudentScoreDto> Scores { get; set; }
+        }
+        public class StudentScoreDto
+        {
+            public string StudentId { get; set; }
+            public string Score { get; set; }
         }
 
         private void SendNotificaion(int classId, int SubjectId,string message = "new assignment notification")

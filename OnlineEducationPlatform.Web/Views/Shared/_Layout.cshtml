@@ -4,6 +4,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @{
     ViewData["Title"] = "Online Education Platform";
+    var user = await UserManager.GetUserAsync(User);
 }
 
 <!DOCTYPE html>
@@ -66,6 +67,9 @@
                         }
                         else
                         {
+                            <li class="nav-item d-flex align-items-center me-2">
+                                <span class="navbar-text fw-semibold text-white bg-primary px-3 py-1 rounded-pill shadow-sm">Welcome, @user.FullName</span>
+                            </li>
                             <li class="nav-item me-2">
                                 <a href="#" id="notificationBell" class="nav-link position-relative" title="Notifications">
                                     <i class="bi bi-bell text-info fs-5" ></i>
@@ -73,9 +77,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    <button class="btn btn-link nav-link" type="submit">Logout</button>
-                                </form>
+                                <a class="btn btn-link nav-link" asp-controller="Account" asp-action="Logout" class="d-inline">Logout</a>
                             </li>
                         }
                     </ul>

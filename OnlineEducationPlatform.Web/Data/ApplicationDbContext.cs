@@ -76,7 +76,7 @@ namespace OnlineEducationPlatform.Infrastructure.Data
                       .WithOne(e => e.Class)
                       .HasForeignKey(e => e.ClassId)
                       .OnDelete(DeleteBehavior.Cascade);
-
+                // Class -> Assignments (One-to-Many)
                 entity.HasMany(c => c.Assignments)
                       .WithOne(a => a.Class)
                       .HasForeignKey(a => a.ClassId)

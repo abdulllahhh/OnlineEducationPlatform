@@ -36,6 +36,7 @@ namespace OnlineEducationPlatform.Web.Controllers
                     SubjectName = a.Subject.Name,
                     AssignmentPath = a.FilePath,
                     HasSubmitted = a.Submissions.Any(s => s.StudentId == studentId),
+                    TotalScore = a.TotalScore,
                     Score = a.Submissions
                             .Where(s => s.StudentId == studentId)
                             .Select(s => s.Score)

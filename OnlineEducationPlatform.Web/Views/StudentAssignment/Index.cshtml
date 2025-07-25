@@ -35,7 +35,7 @@
                         }
                         else
                         {
-                            @(item.Score != null ? item.Score.ToString() : "Grade not available yet");
+                            @(item.Score != null ? item.Score.ToString() + "/" + item.TotalScore : "Grade not available yet");
                         }
                     </td>
                     <td>
