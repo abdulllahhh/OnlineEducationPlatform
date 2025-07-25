@@ -52,7 +52,7 @@
                         <a asp-action="Details" asp-route-id="@item.AssignmentId" class="btn btn-secondary btn-sm me-1"><i class="bi bi-info-circle"></i></a>
                         @if (!item.HasSubmitted)
                         {
-                            <button class="btn btn-success btn-sm">Submit</button>
+                            <button class="btn btn-success btn-sm submit-assignment-btn" data-assignment-id="@item.AssignmentId" data-title="@item.Title" data-description="@item.Description">Submit</button>
                         }
                         else
                         {
@@ -64,6 +64,35 @@
         </tbody>
     </table>
 </div>
+@* Modal for assignment submission *@
+<div class="modal fade" id="submitAssignmentModal" tabindex="-1" aria-labelledby="submitAssignmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="submitAssignmentModalLabel">Submit Assignment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="assignmentSubmissionForm" enctype="multipart/form-data">
+          @Html.AntiForgeryToken()
+          <input type="hidden" id="modalAssignmentId" name="AssignmentId" />
+          <div class="mb-3">
+            <label for="submissionFile" class="form-label">Upload PDF (max 5MB)</label>
+            <input type="file" class="form-control" id="submissionFile" name="SubmissionFile" accept="application/pdf" required />
+            <span class="text-danger" id="submissionFileError"></span>
+          </div>
+        </form>
+        <div class="alert alert-danger d-none" id="submissionError"></div>
+        <div class="alert alert-success d-none" id="submissionSuccess"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="submitAssignmentBtn">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>
 @section Scripts {
     <script src="./js/StudentAssignment.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 }

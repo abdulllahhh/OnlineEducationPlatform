@@ -15,5 +15,6 @@ namespace OnlineEducationPlatform.Web.ViewModels
         public bool HasSubmitted { get; set; }
         public decimal? Score { get; set; }
         public IFormFile AssignmentFile { get; set; }
+        public IFormFile SubmissionFile { get; set; }
     }
 }

@@ -52,7 +52,7 @@ namespace OnlineEducationPlatform.Web.Controllers
         }
 
         // GET: Assignment/Details/5
-        [Authorize(Roles = "Admin,Instructor,Student")]
+        [Authorize(Roles = "Admin,Instructor")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -104,6 +104,11 @@ namespace OnlineEducationPlatform.Web.Controllers
                 if (Path.GetExtension(model.AssignmentFile.FileName).ToLower() != ".pdf")
                 {
                     ModelState.AddModelError("AssignmentFile", "Only PDF files are allowed.");
+                    return View(model);
+                }
+                if (model.AssignmentFile.Length > 2 * 1024 * 1024)
+                {
+                    ModelState.AddModelError("AssignmentFile", "File size must not exceed 2MB.");
                     return View(model);
                 }
                 if (!Directory.Exists(_assignmentFolder))
@@ -194,6 +199,10 @@ namespace OnlineEducationPlatform.Web.Controllers
                 if (Path.GetExtension(model.AssignmentFile.FileName).ToLower() != ".pdf")
                 {
                     ModelState.AddModelError("AssignmentFile", "Only PDF files are allowed.");
+                }
+                if (model.AssignmentFile.Length > 2 * 1024 * 1024)
+                {
+                    ModelState.AddModelError("AssignmentFile", "File size must not exceed 2MB.");
                 }
             }
 
