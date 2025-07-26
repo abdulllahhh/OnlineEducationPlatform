@@ -9,12 +9,15 @@ namespace OnlineEducationPlatform.Web
     {
         public static async Task Main(string[] args)
         {
+            DotNetEnv.Env.Load();
             var builder = WebApplication.CreateBuilder(args);
+            var connectionString = Environment.GetEnvironmentVariable("DevConnection") 
+                    ?? builder.Configuration.GetConnectionString("DefaultConnection"); ;
 
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(connectionString);
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("DefaultConnection"),
                     sqlOptions => sqlOptions.EnableRetryOnFailure());
