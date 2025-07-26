@@ -22,7 +22,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             var enrollment = _context.Enrollments.FirstOrDefault(u => u.StudentId == studentId);
             var exams = _context.Exams
                 .Include(e => e.Submissions)
-                .Where(e => DateTime.Now <= e.AvailableTo && (e.ClassId == enrollment.ClassId) )
+                .Where(e => DateTime.Now <= e.AvailableTo && (e.ClassId == enrollment.ClassId))
                 .Select(e => new ExamListItemViewModel
                 {
                     ExamId = e.ExamId,
@@ -87,8 +87,8 @@ namespace OnlineEducationPlatform.Web.Controllers
 
             if (exam == null) return NotFound();
 
-            decimal totalScore = 0;
-            decimal score = 0;
+            int totalScore = 0;
+            int score = 0;
 
             var answers = new Dictionary<int, string>();
 
@@ -130,7 +130,7 @@ namespace OnlineEducationPlatform.Web.Controllers
         public IActionResult Result(int id)
         {
             var studentId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
+            var student = _context.Users.FirstOrDefault(s => s.Id == studentId);
             var submission = _context.ExamSubmissions
                 .Include(s => s.Exam)
                     .ThenInclude(e => e.Questions)
@@ -143,6 +143,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             {
                 ExamId = submission.ExamId,
                 Title = submission.Exam.Title,
+                PassingScore = submission.Exam.PassingScore,
                 Questions = submission.Exam.Questions.Select(q => new StudentQuestionAnswerViewModel
                 {
                     QuestionId = q.QuestionId,
