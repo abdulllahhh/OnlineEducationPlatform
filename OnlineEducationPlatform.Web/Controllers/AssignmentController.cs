@@ -138,6 +138,7 @@ namespace OnlineEducationPlatform.Web.Controllers
             };
             _context.Add(assignment);
             var subject = _context.Subjects.FirstOrDefault( s=> s.SubjectId == model.SubjectId );
+            await _context.SaveChangesAsync();
             SendNotificaion(model.ClassId, model.SubjectId, $"new assignment has been added to the subject {subject?.Name}");
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
