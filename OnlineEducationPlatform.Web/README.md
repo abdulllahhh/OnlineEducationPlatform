@@ -1,21 +1,7 @@
 
 # 🎓 Online Education Platform
 
-This is a collaborative ASP.NET Core MVC project implementing an **Online Education Platform** using **Clean Architecture**, **Identity for authentication**, **Bootstrap 5 for UI**, and **Entity Framework Core** for data access.
-
----
-
-## 🧱 Project Structure (Clean Architecture)
-
-```
-OnlineEducationPlatform/
-│
-├── OnlineEducationPlatform.Web           → Presentation layer (MVC)
-├── OnlineEducationPlatform.Application   → Business logic & use cases
-├── OnlineEducationPlatform.Infrastructure→ Data access & Identity
-├── OnlineEducationPlatform.Domain        → Core domain models
-└── OnlineEducationPlatform.sln           → Solution file
-```
+This is a collaborative ASP.NET Core MVC project implementing an **Online Education Platform** using **Identity for authentication**, **Bootstrap 5 for UI**, and **Entity Framework Core** for data access.
 
 ---
 
