@@ -4,6 +4,15 @@
 This is a collaborative ASP.NET Core MVC project implementing an **Online Education Platform** using **Identity for authentication**, **Bootstrap 5 for UI**, and **Entity Framework Core** for data access.
 
 ---
+## Live Demo
+
+Check out the live version of the platform here:  
+🔗 [Online Education Platform](https://onlineeducationplatform.runasp.net)
+
+**Admin Login Credentials:**  
+- **Username:** `Admin@platform.com`  
+- **Password:** `Admin123!`
+
 
 ## 🛠️ Getting Started
 
